@@ -55,10 +55,10 @@ This is a simple Todo backend application written in Go, featuring user authenti
 
 ## API Endpoints
 
-- `POST /register`: Register a new user
-- `POST /login`: Login and receive a JWT token
+- `POST /auth/register`: Register a new user
+- `POST /auth/login`: Login and receive a JWT token
 - `GET /todos`: Fetch all todos for the authenticated user
 - `GET /todos/:id`: Fetch a specific todo by ID for the authenticated user
 - `POST /todos`: Create a new todo for the authenticated user
 
-All endpoints except `/register` and `/login` require authentication. Include the JWT token in the Authorization header:
+All endpoints except `/auth/register` and `/auth/login` require authentication. Include the JWT token in the Authorization header:
