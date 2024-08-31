@@ -1,0 +1,3 @@
+ALTER TABLE todos
+ADD COLUMN owner INT NOT NULL,
+ADD CONSTRAINT fk_owner FOREIGN KEY (owner) REFERENCES users(id);

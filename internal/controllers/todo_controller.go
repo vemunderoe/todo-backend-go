@@ -12,7 +12,18 @@ import (
 )
 
 func GetTodos(c *gin.Context) {
-	todos, err := services.GetTodos()
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authenticated"})
+	}
+
+	userClaims, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user information"})
+		return
+	}
+
+	todos, err := services.GetTodos(userClaims)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -21,13 +32,24 @@ func GetTodos(c *gin.Context) {
 }
 
 func GetTodoById(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authenticated"})
+	}
+
+	userClaims, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user information"})
+		return
+	}
+
 	id, err := strconv.Atoi(c.Param("id")); 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	
-	todo, err := services.GetTodoById(id)
+	todo, err := services.GetTodoById(id, userClaims)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -36,12 +58,24 @@ func GetTodoById(c *gin.Context) {
 }
 
 func CreateTodo(c *gin.Context) {
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User is not authenticated"})
+	}
+
+	userClaims, ok := user.(models.User)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user information"})
+		return
+	}
+
 	var input models.Todo
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	input.Owner = userClaims.ID
 	todo, err := services.CreateTodo(input)
 	if err != nil {
 		if errors.Is(err, repositories.ErrTodoNotFound) {

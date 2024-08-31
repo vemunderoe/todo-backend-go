@@ -11,10 +11,10 @@ import (
 )
 
 
-func GetAllTodos() ([]models.Todo, error) {
+func GetAllTodosByUserId(userId int) ([]models.Todo, error) {
 	var todos []models.Todo
 
-	rows, err := db.DB.Query(context.Background(), "SELECT id, title, completed FROM todos")
+	rows, err := db.DB.Query(context.Background(), "SELECT id, title, completed, owner FROM todos WHERE owner = $1", userId)
 	if err != nil {
 		log.Printf("Query failed: %v\n", err)
 		return nil, err
@@ -23,7 +23,7 @@ func GetAllTodos() ([]models.Todo, error) {
 
 	for rows.Next() {
 		var todo models.Todo
-		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed)
+		err := rows.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.Owner)
 		if err != nil {
 			log.Printf("Failed to scan row: %v\n", err)
 			return nil, err
@@ -40,12 +40,12 @@ func GetAllTodos() ([]models.Todo, error) {
 
 var ErrTodoNotFound = errors.New("todo not found")
 
-func GetTodoById(id int) (models.Todo, error) {
+func GetTodoByUserIdAndId(id, userId int) (models.Todo, error) {
 	var todo models.Todo
 
-	row := db.DB.QueryRow(context.Background(), "SELECT id, title, completed FROM todos WHERE id = $1", id)
+	row := db.DB.QueryRow(context.Background(), "SELECT id, title, completed, owner FROM todos WHERE id = $1 and owner = $2", id, userId)
 	
-	err := row.Scan(&todo.ID, &todo.Title, &todo.Completed)
+	err := row.Scan(&todo.ID, &todo.Title, &todo.Completed, &todo.Owner)
 	if err != nil {
 		if err == pgx.ErrNoRows {
 			log.Printf("No todo found with ID %d\n", id)
@@ -62,9 +62,9 @@ func CreateTodo(todo models.Todo) (models.Todo, error) {
 
 	err := db.DB.QueryRow(
 		context.Background(),
-		"INSERT INTO todos (title, completed) VALUES ($1, $2) RETURNING id, title, completed",
-		todo.Title, todo.Completed,
-	).Scan(&newTodo.ID, &newTodo.Title, &newTodo.Completed)
+		"INSERT INTO todos (title, completed, owner) VALUES ($1, $2, $3) RETURNING id, title, completed, owner",
+		todo.Title, todo.Completed, todo.Owner,
+	).Scan(&newTodo.ID, &newTodo.Title, &newTodo.Completed, &newTodo.Owner)
 
 	if err != nil {
 		log.Printf("Failed to insert todo: %v\n", err)

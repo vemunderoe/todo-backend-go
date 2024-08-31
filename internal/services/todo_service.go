@@ -7,8 +7,8 @@ import (
 	"todo-backend/internal/repositories"
 )
 
-func GetTodos() ([]models.Todo, error) {
-	todos, err := repositories.GetAllTodos()
+func GetTodos(user models.User) ([]models.Todo, error) {
+	todos, err := repositories.GetAllTodosByUserId(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -16,8 +16,8 @@ func GetTodos() ([]models.Todo, error) {
 	return todos, nil
 }
 
-func GetTodoById(id int) (models.Todo, error) {
-	todo, err := repositories.GetTodoById(id)
+func GetTodoById(id int, user models.User) (models.Todo, error) {
+	todo, err := repositories.GetTodoByUserIdAndId(id, user.ID)
 	if err != nil {
 		return todo, err
 	}

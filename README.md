@@ -11,9 +11,18 @@ This is a simple Todo backend application written in Go.
 
 1. Clone the repository:
 
+   Using HTTPS:
+
    ```
-   git clone https://github.com/yourusername/todo-backend.git
-   cd todo-backend
+   git clone https://github.com/vemunderoe/todo-backend-go.git
+   cd todo-backend-go
+   ```
+
+   Or using SSH:
+
+   ```
+   git git@github.com:vemunderoe/todo-backend-go.git
+   cd todo-backend-go
    ```
 
 2. Install dependencies:
