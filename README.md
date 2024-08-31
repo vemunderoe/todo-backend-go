@@ -1,6 +1,6 @@
 # Todo Backend
 
-This is a simple Todo backend application written in Go.
+This is a simple Todo backend application written in Go, featuring user authentication and per-user todo management.
 
 ## Prerequisites
 
@@ -11,17 +11,8 @@ This is a simple Todo backend application written in Go.
 
 1. Clone the repository:
 
-   Using HTTPS:
-
    ```
    git clone https://github.com/vemunderoe/todo-backend-go.git
-   cd todo-backend-go
-   ```
-
-   Or using SSH:
-
-   ```
-   git git@github.com:vemunderoe/todo-backend-go.git
    cd todo-backend-go
    ```
 
@@ -34,7 +25,7 @@ This is a simple Todo backend application written in Go.
 3. Set up the PostgreSQL database:
 
    - Create a new database for the project
-   - Update the database connection string in the configuration file (if applicable)
+   - Update the database connection string in the `.env` file (create one if it doesn't exist)
 
 4. Run database migrations:
 
@@ -43,14 +34,6 @@ This is a simple Todo backend application written in Go.
    ```
    go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
    ```
-
-   Create a new migration:
-
-   ```
-   migrate create -ext sql -dir db/migrations -seq create_todos_table
-   ```
-
-   Edit the newly created migration files in `db/migrations` to define your schema.
 
    Run migrations:
 
@@ -72,10 +55,10 @@ This is a simple Todo backend application written in Go.
 
 ## API Endpoints
 
-- `GET /todos`: Fetch all todos
-- `GET /todos/:id`: Fetch a specific todo by ID
-- `POST /todos`: Create a new todo
+- `POST /register`: Register a new user
+- `POST /login`: Login and receive a JWT token
+- `GET /todos`: Fetch all todos for the authenticated user
+- `GET /todos/:id`: Fetch a specific todo by ID for the authenticated user
+- `POST /todos`: Create a new todo for the authenticated user
 
-## Development
-
-To run tests:
+All endpoints except `/register` and `/login` require authentication. Include the JWT token in the Authorization header:
